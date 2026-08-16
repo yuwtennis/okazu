@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Okazu — A prescription pad for the kitchen</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><text y=%2220%22 font-size=%2220%22>🍚</text></svg>">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --bg: #142A21;
+  --bg-deep: #0E1F19;
+  --bg-panel: #1B3327;
+  --paper: #F3ECD9;
+  --paper-dim: #E7DEC4;
+  --amber: #CE9A3E;
+  --amber-bright: #E4B85C;
+  --rust: #B14834;
+  --cream: #EDE6D3;
+  --ink: #241F18;
+  --muted-dark: #A0997F;
+  --muted-light: #6B6250;
+  --line: rgba(237,230,211,0.14);
+
+  --display: 'Fraunces', serif;
+  --body: 'Work Sans', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+
+  --sp-1: 0.5rem;
+  --sp-2: 1rem;
+  --sp-3: 1.5rem;
+  --sp-4: 2.5rem;
+  --sp-5: 4rem;
+  --sp-6: 6.5rem;
+
+  --radius: 10px;
+}
+
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--cream);
+  font-family: var(--body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+img,svg{ display:block; max-width:100%; }
+a{ color: inherit; }
+h1,h2,h3{ font-family: var(--display); font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+p{ margin:0; }
+button{ font-family: inherit; cursor:pointer; }
+
+::selection{ background: var(--amber); color: var(--ink); }
+
+:focus-visible{
+  outline: 2px solid var(--amber-bright);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.wrap{
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--sp-3);
+}
+
+.eyebrow{
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--amber-bright);
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+.eyebrow::before{
+  content:"";
+  width: 22px; height: 1px;
+  background: var(--amber-bright);
+  display: inline-block;
+}
+
+/* ---------- header ---------- */
+header{
+  position: sticky; top:0; z-index: 50;
+  background: rgba(14,31,25,0.86);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.nav{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 1.1rem var(--sp-3);
+  max-width: 1180px; margin: 0 auto;
+}
+.logo{
+  font-family: var(--display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  display:flex; align-items:baseline; gap:0.5rem;
+}
+.logo span{
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--muted-dark);
+  letter-spacing: 0.08em;
+  font-weight:400;
+}
+.nav-links{
+  display:flex; gap: var(--sp-4); align-items:center;
+  font-size: 0.92rem;
+  color: var(--muted-dark);
+}
+.nav-links a{ text-decoration:none; transition: color .15s; }
+.nav-links a:hover{ color: var(--cream); }
+.nav-cta{
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  background: var(--amber);
+  color: var(--ink);
+  padding: 0.6rem 1.1rem;
+  border-radius: 5px;
+  text-decoration:none;
+  font-weight:600;
+  transition: background .15s, transform .15s;
+  border:none;
+}
+.nav-cta:hover{ background: var(--amber-bright); transform: translateY(-1px); }
+@media (max-width: 720px){ .nav-links a:not(.nav-cta){ display:none; } }
+
+/* ---------- hero ---------- */
+.hero{
+  padding: var(--sp-6) 0 var(--sp-5);
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+.hero::before{
+  content:"";
+  position:absolute; inset: -20% -10% auto -10%;
+  height: 480px;
+  background: radial-gradient(ellipse at 30% 20%, rgba(206,154,62,0.14), transparent 60%);
+  pointer-events:none;
+}
+.hero-grid{
+  display:grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: var(--sp-5);
+  align-items: center;
+}
+@media (max-width: 940px){ .hero-grid{ grid-template-columns: 1fr; gap: var(--sp-4); } }
+
+.hero h1{
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  line-height: 1.04;
+  margin: var(--sp-2) 0 var(--sp-3);
+  max-width: 14ch;
+}
+.hero h1 em{
+  font-style: italic;
+  color: var(--amber-bright);
+}
+.hero-sub{
+  font-size: 1.08rem;
+  color: var(--muted-dark);
+  max-width: 46ch;
+  margin-bottom: var(--sp-4);
+}
+.hero-actions{ display:flex; gap: 1rem; flex-wrap:wrap; align-items:center; }
+.btn-primary{
+  background: var(--amber);
+  color: var(--ink);
+  border:none;
+  padding: 0.9rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.98rem;
+  transition: background .15s, transform .15s;
+}
+.btn-primary:hover{ background: var(--amber-bright); transform: translateY(-1px); }
+.btn-ghost{
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--cream);
+  padding: 0.9rem 1.4rem;
+  border-radius: 6px;
+  font-size: 0.98rem;
+  text-decoration:none;
+  transition: border-color .15s, background .15s;
+}
+.btn-ghost:hover{ border-color: var(--amber-bright); background: rgba(206,154,62,0.06); }
+
+.hero-note{
+  margin-top: var(--sp-3);
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  color: var(--muted-dark);
+  display:flex; gap:0.5em; align-items:flex-start;
+  max-width: 40ch;
+}
+
+/* cabinet illustration */
+.cabinet{
+  background: linear-gradient(180deg, #2A4436, #16281F);
+  border-radius: 14px;
+  padding: 1.3rem;
+  border: 1px solid rgba(237,230,211,0.08);
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,0.55);
+}
+.cabinet-label{
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-dark);
+  margin-bottom: 0.9rem;
+  padding: 0 0.2rem;
+}
+.drawers{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+.drawer{
+  background: linear-gradient(180deg, #3C6350, #2C4C3B);
+  border: none;
+  border-radius: 7px;
+  padding: 0.9rem 0.8rem 0.75rem;
+  text-align:left;
+  color: var(--cream);
+  display:flex; flex-direction:column; gap:0.55rem;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 3px 0 rgba(0,0,0,0.25);
+  position:relative;
+}
+.drawer:hover{ transform: translateY(-3px); background: linear-gradient(180deg, #47725D, #335544); }
+.drawer.is-active{ outline: 2px solid var(--amber-bright); outline-offset: -2px; }
+.drawer-handle{
+  width: 34px; height: 4px;
+  border-radius: 3px;
+  background: var(--amber);
+  opacity: 0.85;
+}
+.drawer-icon{ width:20px; height:20px; color: var(--amber-bright); }
+.drawer-label{ font-size: 0.82rem; font-weight: 500; line-height:1.25; }
+
+/* ---------- how it works ---------- */
+.section{ padding: var(--sp-6) 0; }
+.section-head{ margin-bottom: var(--sp-4); max-width: 60ch; }
+.section-head h2{ font-size: clamp(1.7rem, 3vw, 2.3rem); margin-top: 0.6rem; }
+.section-head p{ color: var(--muted-dark); margin-top: 0.8rem; font-size: 1.02rem; }
+
+.steps{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow:hidden;
+}
+@media (max-width: 860px){ .steps{ grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px){ .steps{ grid-template-columns: 1fr; } }
+.step{
+  background: var(--bg-panel);
+  padding: var(--sp-4) var(--sp-3);
+}
+.step-num{
+  font-family: var(--mono);
+  color: var(--amber-bright);
+  font-size: 0.85rem;
+  margin-bottom: 0.9rem;
+}
+.step h3{ font-size: 1.08rem; margin-bottom: 0.5rem; font-weight:600; font-family: var(--body); }
+.step p{ color: var(--muted-dark); font-size: 0.92rem; }
+
+/* ---------- picker ---------- */
+.picker-panel{
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: var(--sp-4);
+}
+.symptom-grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.7rem;
+  margin: var(--sp-3) 0 var(--sp-4);
+}
+@media (max-width: 760px){ .symptom-grid{ grid-template-columns: 1fr 1fr; } }
+@media (max-width: 460px){ .symptom-grid{ grid-template-columns: 1fr; } }
+
+.chip{
+  display:flex; align-items:center; gap:0.7rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--cream);
+  padding: 0.85rem 1rem;
+  border-radius: 9px;
+  font-size: 0.92rem;
+  text-align:left;
+  transition: border-color .15s, background .15s, transform .1s;
+}
+.chip:hover{ border-color: var(--amber); }
+.chip svg{ width:18px; height:18px; color: var(--muted-dark); flex-shrink:0; transition: color .15s; }
+.chip[aria-pressed="true"]{
+  background: rgba(206,154,62,0.14);
+  border-color: var(--amber-bright);
+}
+.chip[aria-pressed="true"] svg{ color: var(--amber-bright); }
+.chip-check{
+  margin-left:auto; width:16px; height:16px; border-radius:50%;
+  border: 1.5px solid var(--muted-dark); flex-shrink:0;
+}
+.chip[aria-pressed="true"] .chip-check{ background: var(--amber-bright); border-color: var(--amber-bright); }
+
+.picker-actions{
+  display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+  border-top: 1px dashed var(--line);
+  padding-top: var(--sp-3);
+}
+.picker-status{ font-family: var(--mono); font-size:0.8rem; color: var(--muted-dark); }
+.picker-status b{ color: var(--amber-bright); font-weight:600; }
+
+/* ---------- results ---------- */
+#results{ margin-top: var(--sp-5); }
+.results-empty{
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  padding: var(--sp-5) var(--sp-3);
+  text-align:center;
+  color: var(--muted-dark);
+  font-size: 0.95rem;
+}
+
+.jar-grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+}
+@media (max-width: 940px){ .jar-grid{ grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px){ .jar-grid{ grid-template-columns: 1fr; } }
+
+.jar{
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 12px;
+  overflow:hidden;
+  display:flex; flex-direction:column;
+  box-shadow: 0 20px 40px -22px rgba(0,0,0,0.5);
+  animation: rise .45s ease both;
+}
+@keyframes rise{ from{ opacity:0; transform: translateY(14px); } to{ opacity:1; transform: translateY(0); } }
+
+.jar-top{
+  background: linear-gradient(180deg, var(--amber-bright), var(--amber));
+  padding: 0.55rem var(--sp-2);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.jar-match{
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight:600;
+  color: var(--ink);
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+}
+.jar-body{ padding: var(--sp-3); flex:1; display:flex; flex-direction:column; }
+.jar-jp{ font-family: var(--mono); font-size: 0.72rem; color: var(--muted-light); letter-spacing: 0.03em; }
+.jar-name{ font-family: var(--display); font-size: 1.32rem; margin: 0.35rem 0 0.6rem; line-height:1.15; }
+.jar-tags{ display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom: 0.9rem; }
+.tag{
+  font-family: var(--mono); font-size: 0.66rem; text-transform:uppercase; letter-spacing:0.04em;
+  background: rgba(36,31,24,0.08);
+  border: 1px solid rgba(36,31,24,0.16);
+  padding: 0.22rem 0.55rem;
+  border-radius: 20px;
+  color: var(--muted-light);
+}
+.jar-meta{
+  display:flex; gap:1rem; font-size:0.8rem; color: var(--muted-light);
+  margin-bottom: 1rem; font-family: var(--mono);
+}
+.jar-toggle{
+  margin-top:auto;
+  background: var(--ink);
+  color: var(--paper);
+  border:none;
+  padding: 0.7rem 1rem;
+  border-radius: 7px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display:flex; align-items:center; justify-content:space-between;
+  transition: background .15s;
+}
+.jar-toggle:hover{ background: #3a3226; }
+.jar-toggle svg{ width:14px; height:14px; transition: transform .2s; }
+.jar[data-open="true"] .jar-toggle svg{ transform: rotate(180deg); }
+
+.jar-detail{
+  max-height:0; overflow:hidden;
+  transition: max-height .32s ease;
+  border-top: 1px dashed rgba(36,31,24,0.2);
+}
+.jar[data-open="true"] .jar-detail{ max-height: 900px; }
+.jar-detail-inner{ padding: var(--sp-3); }
+.detail-block{ margin-bottom: 1.1rem; }
+.detail-block:last-child{ margin-bottom:0; }
+.detail-label{
+  font-family: var(--mono); font-size: 0.68rem; text-transform:uppercase; letter-spacing:0.08em;
+  color: var(--rust); margin-bottom:0.4rem; font-weight:600;
+}
+.detail-block p{ font-size: 0.9rem; color: var(--ink); }
+.detail-block ul{ margin:0; padding-left: 1.1rem; font-size: 0.88rem; }
+.detail-block li{ margin-bottom: 0.3rem; }
+.nutrient-row{ display:flex; flex-wrap:wrap; gap:0.4rem; }
+.nutrient-pill{
+  font-size: 0.76rem; background: rgba(177,72,52,0.1); color: var(--rust);
+  border: 1px solid rgba(177,72,52,0.25); padding: 0.25rem 0.6rem; border-radius: 20px; font-weight:600;
+  cursor: pointer; transition: background .15s, border-color .15s, transform .1s;
+}
+.nutrient-pill:hover,
+.nutrient-pill.is-active {
+  background: rgba(177,72,52,0.22);
+  border-color: var(--rust);
+  transform: translateY(-1px);
+}
+.nutrient-pill.is-pinned {
+  background: var(--rust);
+  border-color: var(--rust);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.why-mark {
+  background: transparent;
+  border-radius: 3px;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: rgba(177,72,52,0.35);
+  transition: background .18s, text-decoration-color .18s;
+}
+.why-mark.is-lit {
+  background: rgba(206,154,62,0.22);
+  text-decoration-color: var(--amber);
+}
+.why-mark.is-pinned {
+  background: rgba(206,154,62,0.32);
+  text-decoration-style: solid;
+  text-decoration-color: var(--amber-bright);
+}
+.detail-hint {
+  font-family: var(--body);
+  font-size: 0.62rem;
+  color: var(--muted-dark);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  margin-left: 0.5rem;
+  font-style: italic;
+}
+.add-rx-btn{
+  width:100%; margin-top: 0.4rem;
+  background: transparent; border: 1.5px solid var(--ink);
+  color: var(--ink); padding: 0.65rem; border-radius: 7px;
+  font-size: 0.82rem; font-weight:600; font-family: var(--mono);
+  transition: background .15s, color .15s;
+}
+.add-rx-btn:hover{ background: var(--ink); color: var(--paper); }
+.add-rx-btn.is-added{ background: var(--rust); border-color: var(--rust); color: var(--paper); }
+
+/* ---------- rx slip (signature element) ---------- */
+.rx-wrap{ margin-top: var(--sp-5); display:none; }
+.rx-wrap.is-visible{ display:block; animation: stamp .4s cubic-bezier(.2,1.4,.4,1) both; }
+@keyframes stamp{
+  0%{ opacity:0; transform: scale(0.9) rotate(-2deg); }
+  60%{ opacity:1; transform: scale(1.02) rotate(0.6deg); }
+  100%{ transform: scale(1) rotate(0deg); }
+}
+.rx-slip{
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 4px;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: var(--sp-4);
+  position: relative;
+  box-shadow: 0 40px 80px -30px rgba(0,0,0,0.6);
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(36,31,24,0.05) 28px);
+}
+.rx-slip::before{
+  content:"";
+  position:absolute; left:0; right:0; bottom:-1px;
+  height: 14px;
+  background-image: radial-gradient(circle at 8px 0, var(--bg) 6px, transparent 7px);
+  background-size: 16px 14px;
+  background-repeat: repeat-x;
+}
+.rx-head{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 0.8rem; margin-bottom: 1rem;
+}
+.rx-head-brand{ font-family: var(--display); font-size: 1.3rem; font-weight:700; }
+.rx-head-brand span{ display:block; font-family: var(--mono); font-size:0.62rem; font-weight:400; color: var(--muted-light); margin-top:0.2rem;}
+.rx-head-meta{ text-align:right; font-family: var(--mono); font-size: 0.72rem; color: var(--muted-light); }
+.rx-field{ margin-bottom: 0.85rem; font-family: var(--mono); font-size: 0.85rem; }
+.rx-field-label{ font-size: 0.65rem; text-transform:uppercase; letter-spacing:0.08em; color: var(--muted-light); margin-bottom:0.15rem; }
+.rx-symbol{ font-family: var(--display); font-size: 1.6rem; font-weight:700; margin-right:0.3rem; }
+.rx-dish{ font-family: var(--display); font-size: 1.15rem; font-weight:600; }
+.rx-sig{ font-size:0.85rem; line-height:1.5; }
+.rx-foot{
+  display:flex; justify-content:space-between; align-items:flex-end;
+  margin-top: 1.3rem; padding-top: 1rem; border-top: 1px dashed rgba(36,31,24,0.25);
+}
+.rx-stamp{
+  font-family: var(--mono); font-size: 0.68rem; font-weight:700; letter-spacing:0.06em;
+  color: var(--rust); border: 2px solid var(--rust); border-radius: 6px;
+  padding: 0.35rem 0.6rem; transform: rotate(-4deg); text-transform:uppercase;
+  display:inline-block;
+}
+.rx-note{ font-size:0.7rem; color: var(--muted-light); max-width: 32ch; text-align:right; }
+
+/* ---------- case notes ---------- */
+.cases{ display:grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+@media (max-width: 760px){ .cases{ grid-template-columns: 1fr; } }
+.case-card{
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: var(--sp-4);
+}
+.case-tab{
+  display:inline-block; font-family: var(--mono); font-size: 0.68rem; letter-spacing:0.08em;
+  color: var(--ink); background: var(--amber); padding: 0.25rem 0.6rem; border-radius:4px;
+  margin-bottom: 1rem; font-weight:700;
+}
+.case-card h3{ font-size: 1.2rem; margin-bottom: 0.3rem; }
+.case-role{ color: var(--muted-dark); font-size: 0.86rem; margin-bottom: 1rem; }
+.case-row{ display:flex; gap: 0.6rem; font-size: 0.86rem; margin-bottom: 0.5rem; }
+.case-row b{ color: var(--amber-bright); font-weight:600; min-width: 92px; flex-shrink:0; }
+.case-quote{
+  margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--line);
+  font-style: italic; color: var(--cream); font-size: 0.92rem;
+}
+
+/* ---------- footer ---------- */
+footer{ border-top: 1px solid var(--line); padding: var(--sp-5) 0 var(--sp-4); }
+.disclaimer{
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--rust);
+  border-radius: 8px;
+  padding: var(--sp-3);
+  font-size: 0.86rem;
+  color: var(--muted-dark);
+  margin-bottom: var(--sp-4);
+}
+.disclaimer b{ color: var(--cream); }
+.footer-bottom{
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;
+  font-size: 0.8rem; color: var(--muted-dark); font-family: var(--mono);
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior:auto !important; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <div class="logo">おかず<span>OKAZU — PREVENTATIVE SIDES</span></div>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#picker">Build your Rx</a>
+      <a href="#cases">Case notes</a>
+      <a href="#picker" class="nav-cta">Start</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Before it becomes a diagnosis</div>
+      <h1>Prescribe your dinner <em>before</em> your doctor has to.</h1>
+      <p class="hero-sub">Okazu turns what your body is quietly telling you into a small side dish for tonight — grounded in the nutrition science of everyday Japanese home cooking, not a cure, just a better habit.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="document.getElementById('picker').scrollIntoView()">Build my prescription</button>
+        <a href="#how" class="btn-ghost">See how it works</a>
+      </div>
+      <div class="hero-note">
+        <span>⚠</span>
+        <span>Not a diagnosis or a remedy. If a symptom persists, please see a physician — Okazu is a habit, not a treatment.</span>
+      </div>
+    </div>
+
+    <div class="cabinet">
+      <div class="cabinet-label">The Cabinet — tap what you're feeling</div>
+      <div class="drawers" id="heroDrawers"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">The workflow</div>
+      <h2>Four steps, same as a real prescription</h2>
+      <p>No accounts, no tracking, no wearables to sync. Just tell it how you feel, and cook.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Register how you feel</h3>
+        <p>Pick the symptoms you've been noticing lately — nothing clinical, just what's true this week.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>See what's recommended</h3>
+        <p>Get matched to home-cooked side dishes chosen for those exact symptoms, ranked by relevance.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Read why it works</h3>
+        <p>Every dish opens into the nutrients behind it, in plain language — no jargon, no vague claims.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <h3>Cook, and repeat it</h3>
+        <p>Take home a prescription slip built for a real dinner — meant to become a weekly habit, not a one-off.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="picker">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Step 01 · Register</div>
+      <h2>What have you been feeling lately?</h2>
+      <p>Select everything that applies. You can change this any time — Okazu re-matches instantly.</p>
+    </div>
+
+    <div class="picker-panel">
+      <div class="symptom-grid" id="symptomGrid"></div>
+      <div class="picker-actions">
+        <div class="picker-status" id="pickerStatus"><b>0</b> symptoms selected</div>
+        <button class="btn-primary" id="rxButton" disabled>Write my prescription</button>
+      </div>
+    </div>
+
+    <div id="results">
+      <div class="results-empty" id="resultsEmpty">Select at least one symptom above to see matching dishes.</div>
+      <div class="jar-grid" id="jarGrid" style="display:none;"></div>
+    </div>
+
+    <div class="rx-wrap" id="rxWrap">
+      <div class="rx-slip" id="rxSlip"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="cases">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Step 03 · In practice</div>
+      <h2>Case notes from two early users</h2>
+      <p>Anonymized, with permission, from Okazu's first pilot group.</p>
+    </div>
+    <div class="cases">
+      <div class="case-card">
+        <span class="case-tab">Case 01</span>
+        <h3>Office worker, 9–5</h3>
+        <div class="case-role">Weekday desk job, minimal time to research nutrition.</div>
+        <div class="case-row"><b>Noticed</b><span>Body fat percentage in the obese range on a routine scan; low energy by mid-afternoon.</span></div>
+        <div class="case-row"><b>Selected</b><span>High body fat %, Low energy / fatigue</span></div>
+        <div class="case-row"><b>Prescribed</b><span>Saba Shioyaki with Daikon Oroshi, Shogayaki</span></div>
+        <p class="case-quote">"I didn't know which food to eat — I just knew I should change something. Having two dishes on rotation was easier than a diet plan I'd never follow."</p>
+      </div>
+      <div class="case-card">
+        <span class="case-tab">Case 02</span>
+        <h3>Retail sales manager</h3>
+        <div class="case-role">Long shifts on her feet, wanted to check nutrition before booking a clinic visit.</div>
+        <div class="case-row"><b>Noticed</b><span>Occasional lightheadedness and fatigue by the end of a shift.</span></div>
+        <div class="case-row"><b>Selected</b><span>Anemia / lightheaded, Low energy / fatigue</span></div>
+        <div class="case-row"><b>Prescribed</b><span>Asari no Miso Shiru, Hourensou no Gomaae</span></div>
+        <p class="case-quote">"I wanted to rule out the obvious first. Two weeks of clam miso soup and I felt more like myself — I still went to get checked, but I went in with a habit already started."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="disclaimer">
+      <b>Okazu is not a medical device.</b> It does not diagnose, treat, or cure any condition. Recommendations are general nutrition information based on common home-cooked dishes, intended to support everyday habits — not to replace clinical care. If a symptom is severe, sudden, or persistent, please see a licensed physician.
+    </div>
+    <div class="footer-bottom">
+      <span>OKAZU © 2026 — a prescription pad for the kitchen</span>
+      <span>Built for Perfect Landing: Comfort Food</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ---------------- icons ---------------- */
+const icons = {
+  fatigue: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="8" width="15" height="8" rx="1.5"/><rect x="20" y="10.5" width="1.6" height="3"/><rect x="5.5" y="10.5" width="4" height="3" fill="currentColor" stroke="none"/></svg>`,
+  weight: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="13" r="8"/><path d="M12 13 L15.5 9.5"/><circle cx="12" cy="13" r="1" fill="currentColor" stroke="none"/><path d="M9 4h6" stroke-linecap="round"/></svg>`,
+  anemia: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3c3 4.2 6 8 6 11.2A6 6 0 1 1 6 14.2C6 11 9 7.2 12 3Z"/></svg>`,
+  stress: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h4l2-6 4 12 2-8 2 4h4"/></svg>`,
+  sleep: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg>`,
+  digestion: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3c-2 3-3 5-3 8a7 7 0 0 0 14 0c0-2-1-3.5-2.5-4.5"/><path d="M8 3c1 1.5 1 3 0 4.5"/></svg>`
+};
+
+/* ---------------- helpers ---------------- */
+const nutrientKey = name => name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+/* Converts [[NutrientName:visible phrase]] tokens into linked <mark> elements */
+function parseWhy(text) {
+  return text.replace(/\[\[([^\]]+):([^\]]+)\]\]/g, (_, nutrient, phrase) =>
+    `<mark class="why-mark" data-nkey="${nutrientKey(nutrient)}">${phrase}</mark>`
+  );
+}
+
+/* ---------------- data ---------------- */
+const symptoms = [
+  { id:'fatigue',   label:'Low energy / fatigue' },
+  { id:'weight',    label:'High body fat %' },
+  { id:'anemia',    label:'Anemia / lightheaded' },
+  { id:'stress',    label:'Stress / irritability' },
+  { id:'sleep',     label:'Restless sleep' },
+  { id:'digestion', label:'Bloating / sluggish digestion' }
+];
+
+const dishes = [
+  {
+    id:'saba', name:'Saba Shioyaki', jp:'鯖の塩焼き · Salt-grilled mackerel, grated daikon',
+    tags:['weight','fatigue'], time:'20 min', difficulty:'Easy',
+    nutrients:['Omega-3 (EPA/DHA)','Vitamin D','Lean protein'],
+    why:'Fatty fish like mackerel delivers [[Omega-3 (EPA/DHA):omega-3 fatty acids (EPA & DHA) that research links to healthier lipid profiles and reduced inflammation]]. It is also one of the few food sources of [[Vitamin D:vitamin D, which regulates fat-storage signals and supports energy production]]. Its [[Lean protein:high lean-protein content helps preserve muscle mass during weight management]]. Grated daikon contributes digestive enzymes that lighten the meal.',
+    ingredients:['1 mackerel fillet, salted 15 min','1 tbsp grated daikon','1 lemon wedge','Steamed rice, to serve'],
+    steps:['Pat the salted mackerel dry.','Grill or pan-sear skin-side down, 4–5 min per side.','Top with grated daikon and a squeeze of lemon.','Serve with a small bowl of rice.']
+  },
+  {
+    id:'asari', name:'Asari no Miso Shiru', jp:'あさりの味噌汁 · Clam & miso soup',
+    tags:['anemia','fatigue'], time:'15 min', difficulty:'Easy',
+    nutrients:['Iron','Vitamin B12','Zinc'],
+    why:'Clams are among the most concentrated food sources of [[Iron:iron, essential for building haemoglobin and supporting red blood cell production]] and [[Vitamin B12:vitamin B12, which the body needs to mature those red blood cells and maintain nerve function]]. [[Zinc:Zinc]] activates enzymes that help the body absorb iron more efficiently. The fermented miso base adds probiotics that support overall gut absorption.',
+    ingredients:['200g clams, purged of sand','2 cups dashi stock','2 tbsp miso paste','1 scallion, sliced'],
+    steps:['Simmer clams in dashi until shells open.','Remove from heat, dissolve miso into the broth.','Discard any unopened shells.','Garnish with sliced scallion and serve hot.']
+  },
+  {
+    id:'hourensou', name:'Hourensou no Gomaae', jp:'ほうれん草の胡麻和え · Sesame spinach',
+    tags:['anemia','digestion'], time:'10 min', difficulty:'Easy',
+    nutrients:['Non-heme iron','Vitamin C','Calcium'],
+    why:'Spinach carries [[Non-heme iron:plant-based (non-heme) iron, which absorbs far better when vitamin C is present in the same meal]]. The leaves also supply [[Vitamin C:a meaningful amount of vitamin C]] — the two together can raise iron absorption up to threefold compared with iron alone. Sesame seeds add [[Calcium:calcium and healthy fats]] that help the body use the fat-soluble nutrients from the leaves.',
+    ingredients:['1 bunch spinach, blanched','2 tbsp ground sesame seeds','1 tsp soy sauce','1/2 tsp sugar'],
+    steps:['Blanch spinach 30 seconds, then squeeze dry and chop.','Mix ground sesame, soy sauce and sugar into a paste.','Toss spinach through the sesame dressing.','Chill briefly before serving.']
+  },
+  {
+    id:'natto', name:'Nattō Gohan', jp:'納豆ご飯 · Fermented soybeans over rice',
+    tags:['stress','digestion'], time:'5 min', difficulty:'Easy',
+    nutrients:['Vitamin K2','Probiotics','Magnesium'],
+    why:'Fermented soy is packed with [[Probiotics:live beneficial bacteria that feed the gut microbiome]], which plays a documented role in serotonin regulation via the gut-brain axis — connecting digestive health to mood and stress resilience. Nattō is also one of the few food sources of [[Vitamin K2:vitamin K2 (MK-7)]]. [[Magnesium:Magnesium]] in the beans supports normal nervous-system function and helps regulate the stress-hormone response.',
+    ingredients:['1 pack nattō','1 bowl steamed rice','1 tsp soy sauce','1/2 tsp karashi mustard (optional)'],
+    steps:['Stir nattō vigorously until stringy.','Mix in soy sauce and mustard.','Spoon over hot rice.','Eat immediately while the rice is warm.']
+  },
+  {
+    id:'kabocha', name:'Kabocha no Nimono', jp:'かぼちゃの煮物 · Simmered pumpkin',
+    tags:['digestion','weight'], time:'25 min', difficulty:'Medium',
+    nutrients:['Beta-carotene','Fiber','Potassium'],
+    why:'Kabocha is high in [[Fiber:dietary fibre, which slows glucose absorption and extends satiety]], useful for steady energy and weight management. Its rich orange flesh reflects a dense supply of [[Beta-carotene:beta-carotene (provitamin A), which supports immune and metabolic function]]. [[Potassium:Potassium]] helps maintain fluid balance and counters the blood-pressure effects of dietary sodium.',
+    ingredients:['300g kabocha pumpkin, cubed','1 cup dashi stock','1 tbsp soy sauce','1 tbsp mirin'],
+    steps:['Simmer kabocha in dashi until just tender.','Add soy sauce and mirin.','Continue simmering until liquid reduces by half.','Rest 5 minutes off heat to let flavor absorb.']
+  },
+  {
+    id:'shogayaki', name:'Shogayaki', jp:'生姜焼き · Ginger pork stir-fry',
+    tags:['fatigue','digestion'], time:'15 min', difficulty:'Easy',
+    nutrients:['Vitamin B1 (thiamine)','Iron','Gingerol'],
+    why:'Pork is one of the richest dietary sources of [[Vitamin B1 (thiamine):vitamin B1 (thiamine), which the body needs to convert carbohydrates into usable ATP energy]] — a common nutritional gap behind everyday fatigue. Pork also provides [[Iron:heme iron, which is absorbed more efficiently than plant-based sources]]. Fresh ginger contributes [[Gingerol:gingerol, an active compound that stimulates digestive enzymes]] and reduces gut inflammation to help the meal sit easier.',
+    ingredients:['150g thin-sliced pork','1 tbsp grated ginger','1 tbsp soy sauce','1 tbsp mirin'],
+    steps:['Marinate pork in ginger, soy sauce and mirin, 10 min.','Sear in a hot pan, 2 min per side.','Reduce the remaining marinade to a glaze.','Pour over the pork and serve with cabbage.']
+  },
+  {
+    id:'yudofu', name:'Yudofu', jp:'湯豆腐 · Warm tofu & mushroom hot pot',
+    tags:['sleep','stress'], time:'15 min', difficulty:'Easy',
+    nutrients:['Glycine','Magnesium','Low stimulant'],
+    why:'Tofu is a natural source of [[Glycine:glycine, an amino acid studied for its role in lowering core body temperature]], the key physiological signal that triggers sleep onset. Mushrooms add [[Magnesium:magnesium, which supports muscle relaxation and nervous-system calm]] at the end of the day. This dish is intentionally [[Low stimulant:free of stimulants and heavy spice]], making it an ideal wind-down meal.',
+    ingredients:['1 block soft tofu','4 enoki mushrooms','1 piece kombu','Ponzu, to serve'],
+    steps:['Simmer kombu in water to make a light broth.','Add tofu and mushrooms, warm gently — do not boil.','Ladle into a bowl with a little broth.','Serve with ponzu on the side.']
+  }
+];
+
+const symptomLabel = id => symptoms.find(s => s.id === id)?.label ?? id;
+
+/* ---------------- state ---------------- */
+let selected = new Set();
+
+/* ---------------- render: hero drawers ---------------- */
+const heroDrawers = document.getElementById('heroDrawers');
+symptoms.forEach(s => {
+  const el = document.createElement('button');
+  el.className = 'drawer';
+  el.type = 'button';
+  el.dataset.id = s.id;
+  el.innerHTML = `<span class="drawer-icon">${icons[s.id]}</span><span class="drawer-handle"></span><span class="drawer-label">${s.label}</span>`;
+  el.addEventListener('click', () => {
+    toggleSymptom(s.id);
+    document.getElementById('picker').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+  heroDrawers.appendChild(el);
+});
+
+/* ---------------- render: symptom chips ---------------- */
+const symptomGrid = document.getElementById('symptomGrid');
+symptoms.forEach(s => {
+  const el = document.createElement('button');
+  el.className = 'chip';
+  el.type = 'button';
+  el.dataset.id = s.id;
+  el.setAttribute('aria-pressed', 'false');
+  el.innerHTML = `${icons[s.id]}<span>${s.label}</span><span class="chip-check" aria-hidden="true"></span>`;
+  el.addEventListener('click', () => toggleSymptom(s.id));
+  symptomGrid.appendChild(el);
+});
+
+function toggleSymptom(id){
+  if (selected.has(id)) selected.delete(id); else selected.add(id);
+  syncChips();
+  renderResults();
+}
+
+function syncChips(){
+  document.querySelectorAll('.chip').forEach(c => {
+    const on = selected.has(c.dataset.id);
+    c.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  document.querySelectorAll('.drawer').forEach(d => {
+    d.classList.toggle('is-active', selected.has(d.dataset.id));
+  });
+  document.getElementById('pickerStatus').innerHTML = `<b>${selected.size}</b> symptom${selected.size===1?'':'s'} selected`;
+  document.getElementById('rxButton').disabled = selected.size === 0;
+}
+
+/* ---------------- render: results ---------------- */
+const jarGrid = document.getElementById('jarGrid');
+const resultsEmpty = document.getElementById('resultsEmpty');
+
+function matchScore(dish){
+  return dish.tags.filter(t => selected.has(t)).length;
+}
+
+function renderResults(){
+  if (selected.size === 0){
+    jarGrid.style.display = 'none';
+    resultsEmpty.style.display = 'block';
+    resultsEmpty.textContent = 'Select at least one symptom above to see matching dishes.';
+    hideRx();
+    return;
+  }
+  const matches = dishes
+    .map(d => ({ dish: d, score: matchScore(d) }))
+    .filter(m => m.score > 0)
+    .sort((a,b) => b.score - a.score);
+
+  if (matches.length === 0){
+    jarGrid.style.display = 'none';
+    resultsEmpty.style.display = 'block';
+    resultsEmpty.textContent = "No direct match yet for that combination — try adding or removing a symptom.";
+    hideRx();
+    return;
+  }
+
+  resultsEmpty.style.display = 'none';
+  jarGrid.style.display = 'grid';
+  jarGrid.innerHTML = '';
+
+  matches.forEach(({dish, score}) => {
+    const jar = document.createElement('article');
+    jar.className = 'jar';
+    jar.dataset.open = 'false';
+    jar.innerHTML = `
+      <div class="jar-top">
+        <span class="jar-match">${score} symptom match${score>1?'es':''}</span>
+      </div>
+      <div class="jar-body">
+        <div class="jar-jp">${dish.jp}</div>
+        <h3 class="jar-name">${dish.name}</h3>
+        <div class="jar-tags">${dish.tags.map(t => `<span class="tag">${symptomLabel(t)}</span>`).join('')}</div>
+        <div class="jar-meta"><span>⏱ ${dish.time}</span><span>${dish.difficulty}</span></div>
+        <button class="jar-toggle" type="button" aria-expanded="false">
+          Why this works
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+      </div>
+      <div class="jar-detail">
+        <div class="jar-detail-inner">
+          <div class="detail-block">
+            <div class="detail-label">Active nutrients <span class="detail-hint">hover or click to highlight</span></div>
+            <div class="nutrient-row">${dish.nutrients.map(n => `<span class="nutrient-pill" data-nkey="${nutrientKey(n)}" tabindex="0" role="button" aria-pressed="false">${n}</span>`).join('')}</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Why it's effective</div>
+            <p>${parseWhy(dish.why)}</p>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Ingredients</div>
+            <ul>${dish.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Cook it</div>
+            <ul>${dish.steps.map(s => `<li>${s}</li>`).join('')}</ul>
+          </div>
+          <button class="add-rx-btn" type="button">Add to my prescription slip</button>
+        </div>
+      </div>
+    `;
+
+    const toggleBtn = jar.querySelector('.jar-toggle');
+    toggleBtn.addEventListener('click', () => {
+      const open = jar.dataset.open === 'true';
+      jar.dataset.open = open ? 'false' : 'true';
+      toggleBtn.setAttribute('aria-expanded', String(!open));
+    });
+
+    const addBtn = jar.querySelector('.add-rx-btn');
+    addBtn.addEventListener('click', () => {
+      writePrescription(dish);
+      addBtn.textContent = 'Added ✓';
+      addBtn.classList.add('is-added');
+    });
+
+    /* nutrient pill ↔ why-mark interaction */
+    const pills = jar.querySelectorAll('.nutrient-pill[data-nkey]');
+    const marks = jar.querySelectorAll('.why-mark[data-nkey]');
+
+    function clearHighlights() {
+      pills.forEach(p => { p.classList.remove('is-active','is-pinned'); p.setAttribute('aria-pressed','false'); });
+      marks.forEach(m => m.classList.remove('is-lit','is-pinned'));
+    }
+
+    pills.forEach(pill => {
+      const key = pill.dataset.nkey;
+
+      pill.addEventListener('mouseenter', () => {
+        if (pill.classList.contains('is-pinned')) return;
+        pills.forEach(p => { if (!p.classList.contains('is-pinned')) p.classList.toggle('is-active', p.dataset.nkey === key); });
+        marks.forEach(m => { if (!m.classList.contains('is-pinned')) m.classList.toggle('is-lit', m.dataset.nkey === key); });
+      });
+
+      pill.addEventListener('mouseleave', () => {
+        pills.forEach(p => { if (!p.classList.contains('is-pinned')) p.classList.remove('is-active'); });
+        marks.forEach(m => { if (!m.classList.contains('is-pinned')) m.classList.remove('is-lit'); });
+      });
+
+      pill.addEventListener('click', () => {
+        const wasPinned = pill.classList.contains('is-pinned');
+        clearHighlights();
+        if (!wasPinned) {
+          pill.classList.add('is-pinned');
+          pill.setAttribute('aria-pressed','true');
+          marks.forEach(m => { if (m.dataset.nkey === key) m.classList.add('is-pinned'); });
+        }
+      });
+
+      pill.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pill.click(); }
+      });
+    });
+
+    jarGrid.appendChild(jar);
+  });
+}
+
+/* ---------------- signature: rx slip ---------------- */
+const rxWrap = document.getElementById('rxWrap');
+const rxSlip = document.getElementById('rxSlip');
+
+function hideRx(){
+  rxWrap.classList.remove('is-visible');
+}
+
+function writePrescription(dish){
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+  const symptomList = [...selected].map(symptomLabel).join(', ');
+
+  rxSlip.innerHTML = `
+    <div class="rx-head">
+      <div class="rx-head-brand">Okazu<span>Kitchen prescription pad</span></div>
+      <div class="rx-head-meta">No. ${String(Math.floor(Math.random()*900)+100)}<br>${dateStr}</div>
+    </div>
+    <div class="rx-field">
+      <div class="rx-field-label">Presenting symptoms</div>
+      ${symptomList}
+    </div>
+    <div class="rx-field">
+      <div class="rx-field-label">Rx</div>
+      <span class="rx-symbol">℞</span><span class="rx-dish">${dish.name}</span> <span style="color:var(--muted-light)">— ${dish.jp}</span>
+    </div>
+    <div class="rx-field">
+      <div class="rx-field-label">Sig (directions)</div>
+      <div class="rx-sig">Take 3× weekly with dinner, ${dish.time} to prepare. Pair with rest and hydration. Active compounds: ${dish.nutrients.join(', ')}.</div>
+    </div>
+    <div class="rx-foot">
+      <span class="rx-stamp">Preventative use only</span>
+      <span class="rx-note">Refills: unlimited — this is food, not medicine. Not a substitute for medical care.</span>
+    </div>
+  `;
+  rxWrap.classList.add('is-visible');
+  rxWrap.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+document.getElementById('rxButton').addEventListener('click', () => {
+  const matches = dishes
+    .map(d => ({ dish: d, score: matchScore(d) }))
+    .filter(m => m.score > 0)
+    .sort((a,b) => b.score - a.score);
+  if (matches.length > 0) writePrescription(matches[0].dish);
+});
+
+syncChips();
+renderResults();
+</script>
+
+</body>
+</html>
